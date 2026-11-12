@@ -1,0 +1,282 @@
+import type { ChatStatus } from "ai";
+import type { ComponentType } from "react";
+
+export type ConnectionState = "connecting" | "connected" | "disconnected";
+export type LightPalette = "warm-paper" | "solarized-light";
+export type ThemeMode = "system" | "light" | "dark";
+export type AppView = "chat" | "projects";
+export type SystemTone = "info" | "success" | "error";
+export type ToolState = "input-streaming" | "input-available" | "output-available" | "output-error";
+
+export type PromptImage = {
+  data: string;
+  mimeType: string;
+};
+
+export type PromptCommand = {
+  id: string;
+  message: string;
+  images?: PromptImage[];
+};
+
+export type ChatItem =
+  | {
+      kind: "message";
+      id: string;
+      role: "user" | "assistant";
+      text: string;
+      reasoning?: string;
+      streaming?: boolean;
+      copyable?: boolean;
+      presentation?: "normal" | "activity";
+      cost?: number;
+      images?: PromptImage[];
+      /** Session entry tree node ID, used for inline editing via navigate_tree. */
+      entryId?: string;
+      relatedEntryIds?: string[];
+    }
+  | {
+      kind: "tool";
+      id: string;
+      name: string;
+      input: unknown;
+      output?: unknown;
+      outputDetails?: unknown;
+      errorText?: string;
+      state: ToolState;
+      open?: boolean;
+      /** Wall-clock start/end (ms) for the live elapsed timer; absent for replayed history. */
+      startedAt?: number;
+      finishedAt?: number;
+      entryId?: string;
+      relatedEntryIds?: string[];
+    }
+  | {
+      kind: "system";
+      id: string;
+      text: string;
+      tone?: SystemTone;
+      entryId?: string;
+      relatedEntryIds?: string[];
+    };
+
+export type RpcEvent = {
+  type: string;
+  payload?: unknown;
+  message?: PiMessage;
+  assistantMessageEvent?: {
+    type: string;
+    delta?: string;
+  };
+  toolCallId?: string;
+  toolName?: string;
+  args?: unknown;
+  partialResult?: unknown;
+  result?: unknown;
+  isError?: boolean;
+  name?: string;
+  summary?: string;
+  error?: string;
+  method?: ExtensionDialog["method"];
+  id?: string;
+  title?: string;
+  options?: string[];
+  timeout?: number;
+  placeholder?: string;
+  prefill?: string;
+  notifyType?: "info" | "warning" | "error";
+  enabled?: boolean;
+  model?: ModelInfo;
+};
+
+export type PiMessage = {
+  id?: string;
+  role: "user" | "assistant" | "toolResult" | string;
+  content?: string | PiContentBlock[];
+  customType?: string;
+  details?: unknown;
+  usage?: Usage;
+  toolCallId?: string;
+  toolName?: string;
+  isError?: boolean;
+};
+
+export type PiContentBlock =
+  | { type: "text"; text?: string }
+  | { type: "thinking"; thinking?: string }
+  | { type: "toolCall"; id?: string; name?: string; arguments?: unknown }
+  | {
+      type: "image";
+      data?: string;
+      mimeType?: string;
+      source?: { data?: string; media_type?: string };
+    }
+  | Record<string, unknown>;
+
+export type Usage = {
+  input?: number;
+  output?: number;
+  cacheRead?: number;
+  cacheWrite?: number;
+  cost?: { total?: number };
+};
+
+export type UsageTotals = {
+  input: number;
+  output: number;
+  cacheRead: number;
+  cacheWrite: number;
+  cost: number;
+};
+
+export type ContextUsage = {
+  tokens: number | null;
+  contextWindow: number;
+  percent: number | null;
+};
+
+export type ModelInfo = {
+  id: string;
+  provider?: string;
+  contextWindow?: number;
+};
+
+export type WsRequest = {
+  type: "req";
+  id: string;
+  method: string;
+  params?: Record<string, unknown>;
+};
+
+export type WsResponse = {
+  type: "res";
+  id: string;
+  ok: boolean;
+  result?: unknown;
+  error?: string;
+};
+
+export type WsEvent = {
+  type: "event";
+  event: string;
+  payload?: Record<string, unknown>;
+};
+
+export type WsError = {
+  type: "error";
+  id?: string;
+  code?: string;
+  message: string;
+};
+
+export type StateSyncPayload = {
+  liveEvents?: WsEvent[];
+  entries?: SessionEntry[];
+  tree?: SessionTreeNode[];
+  leafId?: string | null;
+  model?: ModelInfo;
+  thinkingLevel?: string;
+  sessionName?: string;
+  sessionFile?: string;
+  isStreaming?: boolean;
+  contextUsage?: ContextUsage | null;
+};
+
+export type SessionEntry = {
+  type: string;
+  id?: string;
+  parentId?: string | null;
+  timestamp?: string;
+  customType?: string;
+  message?: PiMessage;
+  details?: unknown;
+  data?: unknown;
+  value?: unknown;
+  payload?: unknown;
+  summary?: string;
+  label?: string;
+  modelId?: string;
+  provider?: string;
+  thinkingLevel?: string;
+  activeToolNames?: string[];
+  usage?: Usage;
+  [key: string]: unknown;
+};
+
+export type SessionTreeNode = {
+  entry: SessionEntry;
+  children: SessionTreeNode[];
+  label?: string;
+  labelTimestamp?: string;
+};
+
+export type ConversationTreeItem = {
+  id: string;
+  parentId: string | null;
+  entry: SessionEntry;
+  entryType: string;
+  isLeaf: boolean;
+  isBranchable: boolean;
+  isContinuable: boolean;
+  continueTargetId?: string;
+  label?: string;
+  text: string;
+  detail?: string;
+  depth: number;
+  connectorColumns: Array<{ key: string; state: "line" | "blank" }>;
+  connectorKind: "none" | "middle" | "last" | "line" | "blank";
+  isExpandable: boolean;
+  isExpanded: boolean;
+  hiddenChildCount: number;
+  childCount: number;
+  isSearchMatch: boolean;
+  order: number;
+};
+
+export type GitStatusResult = {
+  isRepo: boolean;
+  branch: string | null;
+  hasChanges: boolean;
+  additions: number;
+  deletions: number;
+  untracked?: number;
+};
+
+export type GitDiffResult = {
+  isRepo: boolean;
+  branch: string | null;
+  diff: string;
+};
+
+export type RightPanelTab = {
+  id: "git-diff";
+  kind: "git-diff";
+  title: string;
+  branch: string | null;
+  diff?: string;
+  isRepo?: boolean;
+  loading?: boolean;
+  error?: string;
+  updatedAt: number;
+};
+
+export type ExtensionDialog = {
+  id: string;
+  method: "select" | "confirm" | "input" | "editor" | "notify";
+  title?: string;
+  message?: string;
+  options?: string[];
+  timeout?: number;
+  placeholder?: string;
+  prefill?: string;
+  notifyType?: "info" | "warning" | "error";
+};
+
+export type CommandAction = {
+  label: string;
+  desc: string;
+  icon: ComponentType<{ className?: string }>;
+  action: () => void;
+};
+
+export type ChatSubmitStatus = ChatStatus;

@@ -1,0 +1,12 @@
+node_modules/
+.DS_Store
+e2e/.features-gen/
+playwright-report/
+test-results/
+
+# Pi session exports
+pi-session-*.html
+
+.env
+AGENTS.local.md
+.scratch/
