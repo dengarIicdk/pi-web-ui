@@ -9,7 +9,7 @@
 Если у вас уже установлены **Node.js 22.19+** и **Pi coding agent**, откройте **PowerShell** и выполните:
 
 ```powershell
-[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; u="dengarIicdk"; r="pi-web-ui"; t=Join-Path env:TEMP "pi-ui-(Get-Random)"; z="t.zip"; Invoke-WebRequest -Uri "https://github.com" -OutFile z -UseBasicParsing; Expand-Archive -Path z -DestinationPath t -Force; powershell -NoProfile -ExecutionPolicy Bypass -File "\$t\$r-main\install.ps1" -SkipBuild; Remove-Item t,z -Recurse -Force -ErrorAction SilentlyContinue
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; u="dengarIicdk"; r="pi-web-ui"; t=Join-Path env:TEMP "pi-ui-(Get-Random)"; z="t.zip"; Invoke-WebRequest -Uri "https://github.com/dengarIicdk/pi-web-ui" -OutFile z -UseBasicParsing; Expand-Archive -Path z -DestinationPath t -Force; powershell -NoProfile -ExecutionPolicy Bypass -File "\$t\$r-main\install.ps1" -SkipBuild; Remove-Item t,z -Recurse -Force -ErrorAction SilentlyContinue
 ```
 
 Эта команда сама скачает архив без Git, установит готовый собранный интерфейс за 5 секунд, пропишет его в конфиг Pi и удалит за собой временные файлы.
