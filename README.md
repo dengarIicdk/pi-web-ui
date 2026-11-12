@@ -9,10 +9,10 @@
 Если у вас уже установлены **Node.js 22.19+** и **Pi coding agent**, откройте **PowerShell** и выполните:
 
 ```powershell
-[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; u="dengarIicdk"; r="pi-web-ui"; t=Join-Path env:TEMP "pi-ui-(Get-Random)"; z="t.zip"; Invoke-WebRequest -Uri "https://github.com/dengarIicdk/pi-web-ui" -OutFile z -UseBasicParsing; Expand-Archive -Path z -DestinationPath t -Force; powershell -NoProfile -ExecutionPolicy Bypass -File "\$t\$r-main\install.ps1" -SkipBuild; Remove-Item t,z -Recurse -Force -ErrorAction SilentlyContinue
+irm https://raw.githubusercontent.com/dengarIicdk/pi-web-ui/main/setup.ps1 | iex
 ```
 
-Эта команда сама скачает архив без Git, установит готовый собранный интерфейс за 5 секунд, пропишет его в конфиг Pi и удалит за собой временные файлы.
+Эта команда скачает `setup.ps1`, загрузит ZIP-архив ветки `main`, запустит `install.ps1 -SkipBuild`, пропишет интерфейс в конфиг Pi и удалит за собой временные файлы.
 
 ---
 
@@ -37,7 +37,7 @@ git --version
 ### 2. Клонируйте репозиторий
 
 ```powershell
-git clone https://github.com
+git clone https://github.com/dengarIicdk/pi-web-ui.git
 cd pi-web-ui
 ```
 
@@ -99,7 +99,7 @@ powershell -ExecutionPolicy Bypass -File .\install.ps1
 - Дизайн в стиле DeepSeek Harness: тёмная графитовая палитра (`#131417`), центрированная колонка (`860px`), капсула ввода и сворачиваемые карточки `Thinking` / `Tool call`.
 - Живая телеметрия в шапке: скорость генерации (`tok/s`), таймер ответа и визуальная шкала лимита контекста.
 - Автозапуск веб-сервера при старте `pi`.
-- Название и подпись в интерфейсе: `DenGarChiK Web UI`, подпись `by @dengarchik`.
+- Название и подпись в интерфейсе: `DenGarChiK Web UI`, подпись `by @dengarIicdk`.
 - Пакет и импорты переименованы в `@dengarchik/pi-web-ui`.
 - `dist/` включён в репозиторий, чтобы интерфейс можно было развернуть без пересборки.
 
