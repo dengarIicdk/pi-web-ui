@@ -1,10 +1,22 @@
 # DenGarChiK Web UI для Pi
 
-Веб-интерфейс для [Pi coding agent](https://github.com/earendil-works/pi): просмотр и управление сессией Pi из браузера.
+Веб-интерфейс для [Pi coding agent](https://github.com/earendil-works/pi): просмотр и управление сессией Pi из браузера в стиле DeepSeek Harness.
 
 Пакет: `@dengarchik/pi-web-ui` (форк/редизайн `@kkkiio/pi-web-ui`, лицензия MIT — см. `LICENSE`).
 
-## Быстрый старт на чистой Windows
+## Установка в одну команду (Windows 10 / 11 / Server)
+
+Если у вас уже установлены **Node.js 22.19+** и **Pi coding agent**, откройте **PowerShell** и выполните:
+
+```powershell
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; u="dengarIicdk"; r="pi-web-ui"; t=Join-Path env:TEMP "pi-ui-(Get-Random)"; z="t.zip"; Invoke-WebRequest -Uri "https://github.com" -OutFile z -UseBasicParsing; Expand-Archive -Path z -DestinationPath t -Force; powershell -NoProfile -ExecutionPolicy Bypass -File "\$t\$r-main\install.ps1" -SkipBuild; Remove-Item t,z -Recurse -Force -ErrorAction SilentlyContinue
+```
+
+Эта команда сама скачает архив без Git, установит готовый собранный интерфейс за 5 секунд, пропишет его в конфиг Pi и удалит за собой временные файлы.
+
+---
+
+## Быстрый старт на чистой Windows (пошагово)
 
 ### 1. Установите необходимое
 
@@ -25,7 +37,7 @@ git --version
 ### 2. Клонируйте репозиторий
 
 ```powershell
-git clone https://github.com/dengarchik/pi-web-ui.git
+git clone https://github.com
 cd pi-web-ui
 ```
 
@@ -52,8 +64,8 @@ powershell -ExecutionPolicy Bypass -File .\install.ps1 -SkipBuild
 ### 4. Запустите
 
 1. Откройте терминал и запустите `pi`.
-2. В сессии выполните команду `/webui`.
-3. Pi выведет адрес вида `http://127.0.0.1:<порт>`. Откройте его в браузере.
+2. Веб-сервер запустится автоматически при старте сессии (либо вручную командой `/webui`).
+3. Pi выведет адрес вида `http://127.0.0.1:3001`. Откройте его в браузере.
 
 По умолчанию сервер слушает только `127.0.0.1` и доступен только с этого компьютера. Подробности: `docs/configuration.md`.
 
@@ -84,6 +96,9 @@ powershell -ExecutionPolicy Bypass -File .\install.ps1
 
 ## Что изменено относительно оригинала
 
+- Дизайн в стиле DeepSeek Harness: тёмная графитовая палитра (`#131417`), центрированная колонка (`860px`), капсула ввода и сворачиваемые карточки `Thinking` / `Tool call`.
+- Живая телеметрия в шапке: скорость генерации (`tok/s`), таймер ответа и визуальная шкала лимита контекста.
+- Автозапуск веб-сервера при старте `pi`.
 - Название и подпись в интерфейсе: `DenGarChiK Web UI`, подпись `by @dengarchik`.
 - Пакет и импорты переименованы в `@dengarchik/pi-web-ui`.
 - `dist/` включён в репозиторий, чтобы интерфейс можно было развернуть без пересборки.
